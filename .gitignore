@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+.env
+.env.*
+!.env.example
+
+# Market data is not committed: files are large, often licensed, and the
+# repository must not become a redistribution of vendor data.
+data/
+*.parquet
+*.csv
+!tests/**/*.csv
+
+models/
+mlruns/
+.DS_Store

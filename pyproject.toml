@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nqlab"
+version = "0.1.0"
+description = "Research and decision-support system for NQ futures. Not a trading bot."
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "scikit-learn>=1.4",
+    "scipy>=1.12",
+    "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+data = ["yfinance>=0.2", "pyarrow>=15"]
+dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6", "ruff>=0.4", "mypy>=1.9"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
+addopts = "-q --strict-markers"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+# E501: line length is handled by the formatter.
+# RUF002/003: en dashes are deliberate English punctuation in prose, not
+# confusable-character typos. Replacing them would degrade the writing.
+ignore = ["E501", "RUF002", "RUF003"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+disallow_untyped_defs = true
+# pandas and sklearn ship incomplete stubs; strictness applies to our code.
+ignore_missing_imports = true
