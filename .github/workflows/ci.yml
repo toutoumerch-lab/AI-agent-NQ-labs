@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint, typecheck and test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - run: pip install -e ".[dev,data]"
+      - run: ruff check src tests
+      - run: ruff format --check src tests
+      - run: mypy src
+      - name: Test
+        run: pytest --cov=nqlab --cov-report=term-missing
+
+  leakage-gate:
+    name: Leakage gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e ".[dev]"
+
+      # Run separately and first-class. Every out-of-sample claim this project
+      # makes rests on these; a failure here invalidates every downstream
+      # result, so it should be legible as its own red check rather than one
+      # line inside a larger run.
+      - name: Causality of every registered feature
+        run: pytest tests/test_leakage.py -v
+
+      - name: The detector itself must catch known leaks
+        run: pytest tests/test_leakage_detector_works.py -v
