@@ -14,6 +14,9 @@ jobs:
     name: Lint, typecheck and test
     runs-on: ubuntu-latest
     strategy:
+      # Report every leg. With fail-fast on, a failure in one version cancels
+      # the other, so you cannot tell whether the problem is version-specific.
+      fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
     steps:
@@ -26,6 +29,9 @@ jobs:
       - run: pip install -e ".[dev,data]"
       - run: ruff check src tests
       - run: ruff format --check src tests
+      # Runs on both legs. mypy takes its target from the interpreter (see the
+      # note in pyproject.toml), so each leg checks against the numpy stubs it
+      # actually installs: 2.4.x on 3.11, 2.5.x with PEP 695 syntax on 3.12.
       - run: mypy src
       - name: Test
         run: pytest --cov=nqlab --cov-report=term-missing

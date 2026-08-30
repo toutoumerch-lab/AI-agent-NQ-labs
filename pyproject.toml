@@ -39,7 +39,11 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 ignore = ["E501", "RUF002", "RUF003"]
 
 [tool.mypy]
-python_version = "3.11"
+# Deliberately NOT pinned to a python_version, so mypy analyses against the
+# interpreter it runs on. A version matrix needs that: numpy 2.5+ (3.12 only —
+# 3.11 caps at 2.4.x) writes its stubs with PEP 695 `type` statements, which
+# mypy can only parse when targeting 3.12+. Pinning 3.11 here made the 3.12 CI
+# leg fail inside numpy's own stubs rather than on anything in this repository.
 strict = true
 warn_return_any = true
 disallow_untyped_defs = true
