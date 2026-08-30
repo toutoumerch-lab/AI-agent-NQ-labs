@@ -17,7 +17,10 @@ venv/
 
 # Market data is not committed: files are large, often licensed, and the
 # repository must not become a redistribution of vendor data.
-data/
+#
+# Anchored with a leading slash. An unanchored `data/` also matches
+# src/nqlab/data/ — the source package — and silently drops it from the commit.
+/data/
 *.parquet
 *.csv
 !tests/**/*.csv
